@@ -5,7 +5,7 @@ import nltk
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, f1_score
 import re
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk.corpus import stopwords
@@ -49,6 +49,7 @@ def evaluate(y_pred, y_test):
     print("\nConfusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
     
+    print("\n F1-Score = ", f1_score(y_test, y_pred))
     return
 
 
@@ -64,3 +65,15 @@ def predict(text, vectorizer, classifier):
         'sentiment': 'positive' if prediction[0] == 1 else 'negative',
         'confidence': max(probability[0])
     }
+
+def tfid_predict(X_train, y_train, X_test):
+    tfid_vectorizer = TfidfVectorizer(max_features=5000)
+    classifier = LogisticRegression(max_iter=1000)
+    # Vectorize text
+    print("Vectorizing text...")
+    X_train_vec = tfid_vectorizer.fit_transform(X_train)
+    X_test_vec = tfid_vectorizer.transform(X_test)
+
+    train(X_train_vec, y_train, classifier)
+
+    return classifier.predict(X_test_vec)
